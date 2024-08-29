@@ -1,0 +1,44 @@
+from sklearn.model_selection import KFold
+import numpy as np
+
+def cross_validate(X, y, n_splits=5):
+    kfold = KFold(n_splits=n_splits, shuffle=True)
+    fold_no = 1
+    all_histories = []
+    all_models = []
+    
+    for train_index, test_index in kfold.split(X):
+        print(f'Training on fold {fold_no}...')
+        
+        X_train, X_test = np.array(X)[train_index], np.array(X)[test_index]
+        y_train, y_test = np.array(y)[train_index], np.array(y)[test_index]
+
+        # Load base model and add custom layers
+        base_model = tf.keras.applications.MobileNetV2(input_shape=(128,128,3) ,
+                                                       include_top=False,
+                                                       weights='imagenet')
+        base_model.trainable = False
+
+        average_pooling = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
+        prediction_layer = tf.keras.layers.Dense(units=4 , activation='softmax')(average_pooling)
+        model = tf.keras.models.Model(inputs=base_model.input , outputs=prediction_layer)
+
+        model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=0.0001),
+                      loss='sparse_categorical_crossentropy',
+                      metrics=['accuracy'])
+
+        # Train the model
+        history = model.fit(X_train , y_train , validation_data=(X_test , y_test),
+                            batch_size=128,
+                            verbose=1,
+                            epochs=50)
+        
+        all_histories.append(history)
+        all_models.append(model)
+        fold_no += 1
+    
+    return all_histories, all_models
+
+# Example usage:
+# X, y = load_data('data.pkl', 'labels.pkl')
+# histories, models = cross_validate(X, y, n_splits=5)
