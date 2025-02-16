@@ -6,3 +6,4 @@
 ![p1](https://github.com/taesaksit/Plant-Disease-Classification/assets/138297693/4e2f4ff9-cc77-4636-8844-b90d6d1efe9c)
 ![p8](https://github.com/taesaksit/Plant-Disease-Classification/assets/138297693/aecad140-ed8d-4a59-9e6f-fdc14c89ac48)
 
+![Uploading image.png…]()
